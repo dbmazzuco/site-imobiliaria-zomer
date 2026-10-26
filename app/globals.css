@@ -1,26 +1,33 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Paleta da marca Zomer (azul-marinho + vinho do telhado do logo) */
+@theme {
+  --color-marinho: #12204f;
+  --color-marinho-escuro: #0b1534;
+  --color-vinho: #94252c;
+  --color-vinho-claro: #b5373f;
+  --color-areia: #f6f2ec;
+  --color-areia-escura: #ebe4d9;
+  --color-tinta: #1b1d26;
+  --color-cinza: #6b6f7b;
+  --color-linha: #e3ddd3;
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-areia);
+  color: var(--color-tinta);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--color-vinho);
+  color: white;
 }
