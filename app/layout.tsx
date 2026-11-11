@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Manrope } from "next/font/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { WhatsappFlutuante } from "@/components/whatsapp-flutuante";
@@ -31,6 +32,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="pt-BR"
       className={`${manrope.variable} ${fraunces.variable} h-full antialiased`}
     >
+      {/* Google Tag Manager da Zomer (tráfego pago / conversões) */}
+      <GoogleTagManager gtmId="GTM-TRS2HTC8" />
       <body className="min-h-full flex flex-col">
         <Header />
         <main className="flex-1">{children}</main>
