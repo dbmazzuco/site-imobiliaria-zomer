@@ -104,6 +104,21 @@ function parseListagem($: CheerioAPI, finalidade: Finalidade): ImovelResumo[] {
     });
   });
 
+  // Se a resposta não parece uma listagem de verdade (site fora do ar, página de
+  // erro ou de bloqueio que ainda volta com status 200), lança erro em vez de
+  // devolver uma lista vazia. Com o erro, o Next continua mostrando a última
+  // leitura boa e tenta de novo depois; uma lista vazia ficaria em cache como
+  // se a Zomer não tivesse imóveis (foi o que deixou a vitrine zerada em 16/11).
+  const subtitulo = limpa($("#MainContent_lblSubTitulo").text()); // "35 Imóveis encontrados"
+  const esperado = numero(subtitulo);
+  const nenhum = /Nenhum im[oó]vel encontrado/i.test($("body").text());
+  if (esperado === null && !nenhum) {
+    throw new Error(`Listagem de ${finalidade} da Zomer veio sem contagem (layout mudou ou página de erro)`);
+  }
+  if (esperado !== null && imoveis.length < esperado / 2) {
+    throw new Error(`Listagem de ${finalidade}: a Zomer diz ${esperado} imóveis, mas só ${imoveis.length} foram lidos`);
+  }
+
   return imoveis;
 }
 
@@ -121,7 +136,11 @@ export async function getImoveis(): Promise<ImovelResumo[]> {
       ),
     ),
   );
-  return listas.flat();
+  const todos = listas.flat();
+  // Proteção extra: uma imobiliária ativa sem nenhum imóvel é bem mais provável
+  // ser falha de leitura do que realidade. Melhor manter a vitrine anterior.
+  if (todos.length === 0) throw new Error("Nenhum imóvel lido do site da Zomer");
+  return todos;
 }
 
 /**
@@ -139,8 +158,11 @@ export async function getImovel(id: string): Promise<ImovelDetalhe | null> {
   const path = `ImovelSelecionado.aspx?id=${id}&fin=${FIN[resumo.finalidade]}`;
   const $ = await baixa(path);
 
-  // Imóvel removido: a página abre, mas sem título.
-  if (!limpa($("#MainContent_lblTitulo").text())) return null;
+  // Imóvel removido: a página abre, mas com o título vazio. Se o título nem
+  // existe, não é a página do imóvel (erro/bloqueio): lança para manter a anterior.
+  const tituloEl = $("#MainContent_lblTitulo");
+  if (tituloEl.length === 0) throw new Error(`Página do imóvel ${id} veio fora do padrão`);
+  if (!limpa(tituloEl.text())) return null;
 
   const fotos = [
     ...new Set(

@@ -24,12 +24,16 @@ export async function GET(request: NextRequest) {
 
   // A primeira visita depois do revalidateTag recebe a versão antiga e dispara a
   // releitura em segundo plano; fazemos essas visitas aqui, de 6 em 6.
+  // Sempre pelo domínio público: o cron pode chamar pela URL interna do deploy,
+  // que tem proteção de login da Vercel e responderia 401 a essas visitas.
+  const producao = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  const origem = producao ? `https://${producao}` : request.nextUrl.origin;
   const paginas = ["/", ...anteriores.map((id) => `/imovel/${id}`)];
   const status: Record<string, number> = {};
   for (let i = 0; i < paginas.length; i += 6) {
     await Promise.all(
       paginas.slice(i, i + 6).map(async (path) => {
-        const res = await fetch(new URL(path, request.nextUrl.origin), { cache: "no-store" }).catch(
+        const res = await fetch(new URL(path, origem), { cache: "no-store" }).catch(
           () => null,
         );
         status[path] = res?.status ?? 0;
@@ -38,10 +42,15 @@ export async function GET(request: NextRequest) {
   }
 
   const falhas = Object.entries(status).filter(([, s]) => s !== 200);
-  return Response.json({
+  const resultado = {
     ok: falhas.length === 0,
+    origem,
+    anteriores: anteriores.length,
     paginas: paginas.length,
     falhas: Object.fromEntries(falhas),
     em: new Date().toISOString(),
-  });
+  };
+  // Aparece em Logs na Vercel: dá para conferir cada execução do cron.
+  console.log("[sync]", JSON.stringify(resultado));
+  return Response.json(resultado);
 }

@@ -2,17 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, KeyRound, MapPin, MessageCircle, RefreshCw } from "lucide-react";
 import { Catalogo } from "@/components/catalogo";
-import { getImoveis, type ImovelResumo } from "@/lib/zomer";
+import { getImoveis } from "@/lib/zomer";
 import { SITE, whatsappLink } from "@/lib/site";
-
-async function carregaImoveis(): Promise<ImovelResumo[] | null> {
-  try {
-    return await getImoveis();
-  } catch (e) {
-    console.error("Falha ao ler imóveis da Zomer", e);
-    return null;
-  }
-}
 
 const DIFERENCIAIS = [
   {
@@ -33,13 +24,15 @@ const DIFERENCIAIS = [
 ];
 
 export default async function Home() {
-  const imoveis = await carregaImoveis();
-  const destaques = (imoveis ?? [])
+  // Sem try/catch de propósito: se a leitura da Zomer falhar ao revalidar, o erro
+  // faz o Next manter a última versão boa da página em vez de guardar uma vazia.
+  const imoveis = await getImoveis();
+  const destaques = imoveis
     .filter((i) => i.foto)
     .sort((a, b) => Number(b.id) - Number(a.id))
     .slice(0, 3);
-  const qtdAluguel = imoveis?.filter((i) => i.finalidade === "aluguel").length ?? 0;
-  const qtdVenda = imoveis?.filter((i) => i.finalidade === "venda").length ?? 0;
+  const qtdAluguel = imoveis.filter((i) => i.finalidade === "aluguel").length;
+  const qtdVenda = imoveis.filter((i) => i.finalidade === "venda").length;
 
   return (
     <>
@@ -74,18 +67,16 @@ export default async function Home() {
               </a>
             </div>
 
-            {imoveis && (
-              <dl className="mt-12 flex gap-10 border-t border-linha pt-8">
-                <div>
-                  <dt className="text-sm text-cinza">Para alugar</dt>
-                  <dd className="font-display text-4xl text-marinho">{qtdAluguel}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm text-cinza">À venda</dt>
-                  <dd className="font-display text-4xl text-marinho">{qtdVenda}</dd>
-                </div>
-              </dl>
-            )}
+            <dl className="mt-12 flex gap-10 border-t border-linha pt-8">
+              <div>
+                <dt className="text-sm text-cinza">Para alugar</dt>
+                <dd className="font-display text-4xl text-marinho">{qtdAluguel}</dd>
+              </div>
+              <div>
+                <dt className="text-sm text-cinza">À venda</dt>
+                <dd className="font-display text-4xl text-marinho">{qtdVenda}</dd>
+              </div>
+            </dl>
           </div>
 
           {destaques.length === 3 && (
@@ -130,16 +121,7 @@ export default async function Home() {
               Encontre o imóvel certo para você
             </h2>
           </div>
-          {imoveis ? (
-            <Catalogo imoveis={imoveis} />
-          ) : (
-            <div className="rounded-3xl bg-white p-10 text-center ring-1 ring-linha">
-              <p className="font-display text-2xl text-marinho">Estamos atualizando nossa vitrine</p>
-              <p className="mt-2 text-cinza">
-                Fale com a gente pelo WhatsApp {SITE.whatsapp} para ver os imóveis disponíveis.
-              </p>
-            </div>
-          )}
+          <Catalogo imoveis={imoveis} />
         </div>
       </section>
 
