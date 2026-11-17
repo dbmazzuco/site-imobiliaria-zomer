@@ -12,13 +12,27 @@ Landing page da Imobiliária Zomer (Orleans/SC). Os imóveis são lidos **direto
 | Peça | Onde | O que faz |
 | --- | --- | --- |
 | Leitor | `lib/zomer.ts` | Lê `ResultadoBusca.aspx?fin=1/2` (venda/aluguel) e `ImovelSelecionado.aspx` de cada imóvel |
-| Cache diário | `'use cache'` + `cacheLife("days")` | Guarda os dados por 24h; depois disso a próxima visita relê o site em segundo plano |
-| Cron | `vercel.json` → `/api/sync` | Todo dia às 6h (Brasília) força a releitura, para a vitrine já amanhecer atualizada |
+| Cache de 1h | `'use cache'` + `cacheLife("zomer")` (`next.config.ts`) | Relê o site da Zomer no máximo 1h depois da última leitura, em segundo plano |
+| Cron | `vercel.json` → `/api/sync` | Todo dia às 6h (Brasília) força a releitura de tudo; cada execução fica nos Logs como `[sync]` |
+| Monitor | `.github/workflows/monitor.yml` + `scripts/monitor.mjs` | De hora em hora confere a landing contra o site da Zomer; se falhar, o GitHub manda e-mail |
 
 A listagem é a fonte da verdade: se o ID não está mais nela, a página do imóvel mostra
 "Este imóvel não está mais disponível" com sugestões.
 
-> Se a Atoda mudar o layout do site da Zomer, os seletores de `lib/zomer.ts` podem precisar de ajuste.
+### Proteções contra vitrine vazia
+
+- **Leitura suspeita = erro, nunca lista vazia.** A Zomer sempre mostra "N Imóveis encontrados"
+  (ou "Nenhum imóvel encontrado"). Página sem isso, contagem que não bate, total zero ou página de
+  imóvel fora do padrão lançam erro em `lib/zomer.ts`.
+- **Erro mantém a última versão boa.** Com erro na releitura, o Next continua servindo a última
+  vitrine boa (por até 30 dias) e tenta de novo na hora seguinte.
+- **Alerta em até ~1h.** O monitor falha (e o GitHub manda e-mail) se a vitrine estiver vazia, se a
+  landing ou o site da Zomer não responderem, se o site da Zomer mudar de layout, ou se a vitrine
+  ficar diferente da Zomer por mais de 3h. Para rodar na hora: aba **Actions → Monitor landing
+  Zomer → Run workflow**, ou local com `node scripts/monitor.mjs`.
+
+> Se a Atoda mudar o layout do site da Zomer, o monitor avisa e os seletores de `lib/zomer.ts`
+> precisam de ajuste. Enquanto isso a landing segue com a última vitrine boa.
 
 ## Rodar local
 

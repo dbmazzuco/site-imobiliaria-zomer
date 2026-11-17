@@ -5,7 +5,7 @@ import { getImoveis, TAG_IMOVEIS } from "@/lib/zomer";
 // Chamada pelo Vercel Cron todo dia às 6h (horário de Brasília), ver vercel.json.
 // Marca os imóveis como desatualizados e já "acorda" as páginas para que elas releiam
 // o site da Zomer em segundo plano: imóvel novo entra, imóvel alugado/vendido sai.
-// Mesmo sem o cron, os dados se renovam sozinhos a cada 24h (cacheLife "days").
+// Mesmo sem o cron, os dados se renovam sozinhos a cada 1h (cacheLife "zomer").
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
   if (secret && request.headers.get("authorization") !== `Bearer ${secret}`) {

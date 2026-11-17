@@ -1,0 +1,32 @@
+name: Monitor landing Zomer
+
+# De hora em hora confere se a landing tem imóveis e se bate com o site da Zomer.
+# Falhou = o GitHub manda e-mail para quem fez o último commit neste arquivo.
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write # para o passo "manter agendamento ativo"
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Conferir landing e site da Zomer
+        run: node scripts/monitor.mjs
+
+      # Repositório público: o GitHub desliga agendamentos após 60 dias sem
+      # atividade. Reativar o workflow pela API zera essa contagem.
+      - name: Manter agendamento ativo
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/monitor.yml/enable"

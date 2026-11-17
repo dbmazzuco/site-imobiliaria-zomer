@@ -125,7 +125,7 @@ function parseListagem($: CheerioAPI, finalidade: Finalidade): ImovelResumo[] {
 /** Todos os imóveis ativos no site da Zomer (aluguel + venda). */
 export async function getImoveis(): Promise<ImovelResumo[]> {
   "use cache";
-  cacheLife("days");
+  cacheLife("zomer");
   cacheTag(TAG_IMOVEIS);
 
   const listas = await Promise.all(
@@ -149,7 +149,7 @@ export async function getImoveis(): Promise<ImovelResumo[]> {
  */
 export async function getImovel(id: string): Promise<ImovelDetalhe | null> {
   "use cache";
-  cacheLife("days");
+  cacheLife("zomer");
   cacheTag(TAG_IMOVEIS, `imovel-${id}`);
 
   const resumo = (await getImoveis()).find((i) => i.id === id);
