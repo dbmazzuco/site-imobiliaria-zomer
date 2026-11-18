@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, KeyRound, MapPin, MessageCircle, RefreshCw } from "lucide-react";
+import { ArrowRight, BadgeCheck, KeyRound, MapPin, RefreshCw } from "lucide-react";
 import { Catalogo } from "@/components/catalogo";
 import { getImoveis } from "@/lib/zomer";
 import { SITE, whatsappLink } from "@/lib/site";
@@ -56,14 +56,6 @@ export default async function Home() {
                 className="inline-flex items-center gap-2 rounded-full bg-vinho px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-marinho"
               >
                 Ver imóveis disponíveis <ArrowRight className="size-4" />
-              </a>
-              <a
-                href={whatsappLink("Olá! Estou procurando um imóvel e gostaria de ajuda.")}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-marinho ring-1 ring-linha transition-colors hover:ring-marinho"
-              >
-                <MessageCircle className="size-4" /> Falar com um corretor
               </a>
             </div>
 

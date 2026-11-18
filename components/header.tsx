@@ -5,7 +5,7 @@ import { SITE, whatsappLink } from "@/lib/site";
 
 const LINKS = [
   { href: "/#imoveis", label: "Imóveis" },
-  { href: "/#sobre", label: "A Zomer" },
+  { href: "/#sobre", label: "Sobre nós" },
   { href: "/#contato", label: "Contato" },
 ];
 
