@@ -12,8 +12,13 @@ export const SITE = {
   instagram: "https://www.instagram.com/imobiliariazomer/",
 };
 
-export function whatsappLink(mensagem: string) {
-  return `https://wa.me/${SITE.whatsappNumero}?text=${encodeURIComponent(mensagem)}`;
+// Link geral do Tintim: cabeçalho, botão flutuante, rodapé, CTA de proprietários
+// e imóveis de tipo sem link próprio (ver TINTIM abaixo).
+const TINTIM_GERAL =
+  "https://tintim.link/whatsapp/9fd9dba2-37e8-47a7-afee-e7dbb4fd5db1/2e515671-8faa-45eb-823f-fe61306d923a";
+
+export function whatsappLink(mensagem: string, link = TINTIM_GERAL) {
+  return `${link}?text=${encodeURIComponent(mensagem)}`;
 }
 
 export function mensagemImovel(i: Pick<ImovelResumo, "codigo" | "tipo" | "bairro">) {
@@ -29,12 +34,10 @@ const TINTIM: [tipo: string, link: string][] = [
   ["sala", "https://tintim.link/whatsapp/9fd9dba2-37e8-47a7-afee-e7dbb4fd5db1/1272e4cc-295c-4f21-b0a1-402d0fdf4f2d"],
 ];
 
-/** WhatsApp do botão "Tenho interesse": Tintim para apartamentos, casas e salas; direto para o resto. */
+/** WhatsApp do botão "Tenho interesse": link do Tintim do tipo do imóvel, ou o geral. */
 export function whatsappImovel(i: Pick<ImovelResumo, "codigo" | "tipo" | "bairro">) {
-  const mensagem = mensagemImovel(i);
   const tipo = i.tipo.toLowerCase();
-  const tintim = TINTIM.find(([t]) => tipo.startsWith(t))?.[1];
-  return tintim ? `${tintim}?text=${encodeURIComponent(mensagem)}` : whatsappLink(mensagem);
+  return whatsappLink(mensagemImovel(i), TINTIM.find(([t]) => tipo.startsWith(t))?.[1]);
 }
 
 const brl = new Intl.NumberFormat("pt-BR", {
