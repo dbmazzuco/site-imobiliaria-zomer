@@ -5,7 +5,7 @@ import { ArrowLeft, Bath, BedDouble, Car, MessageCircle, Phone, Ruler, Sofa } fr
 import { CardImovel } from "@/components/card-imovel";
 import { Galeria } from "@/components/galeria";
 import { getImovel, getImoveis, type ImovelResumo } from "@/lib/zomer";
-import { SITE, mensagemImovel, moeda, plural, preco, rotuloFinalidade, whatsappLink } from "@/lib/site";
+import { SITE, moeda, plural, preco, rotuloFinalidade, whatsappImovel } from "@/lib/site";
 
 export async function generateStaticParams() {
   const imoveis = await getImoveis();
@@ -163,7 +163,7 @@ async function Detalhe({ params }: Pick<PageProps<"/imovel/[id]">, "params">) {
             )}
 
             <a
-              href={whatsappLink(mensagemImovel(imovel))}
+              href={whatsappImovel(imovel)}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-vinho px-6 py-4 text-sm font-semibold text-white transition-colors hover:bg-marinho"

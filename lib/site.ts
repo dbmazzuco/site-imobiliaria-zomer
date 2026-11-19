@@ -20,6 +20,22 @@ export function mensagemImovel(i: Pick<ImovelResumo, "codigo" | "tipo" | "bairro
   return `Olá! Vi no site o imóvel código ${i.codigo} (${i.tipo}${i.bairro ? `, ${i.bairro}` : ""}) e gostaria de mais informações.`;
 }
 
+// Links do Tintim, que rastreia de qual campanha veio cada conversa. O Tintim
+// aceita ?text=, marca a mensagem com caracteres invisíveis e redireciona para o
+// WhatsApp da Zomer. A chave é o começo do tipo do imóvel, em minúsculas.
+const TINTIM: [tipo: string, link: string][] = [
+  ["apartamento", "https://tintim.link/whatsapp/9fd9dba2-37e8-47a7-afee-e7dbb4fd5db1/c8fbc576-2ae9-400e-a64f-6f17c581bbe9"],
+  ["casa", "https://tintim.link/whatsapp/9fd9dba2-37e8-47a7-afee-e7dbb4fd5db1/6e5673d1-42fa-461b-aba4-7e290d1c87a0"],
+];
+
+/** WhatsApp do botão "Tenho interesse": Tintim para apartamentos e casas, direto para o resto. */
+export function whatsappImovel(i: Pick<ImovelResumo, "codigo" | "tipo" | "bairro">) {
+  const mensagem = mensagemImovel(i);
+  const tipo = i.tipo.toLowerCase();
+  const tintim = TINTIM.find(([t]) => tipo.startsWith(t))?.[1];
+  return tintim ? `${tintim}?text=${encodeURIComponent(mensagem)}` : whatsappLink(mensagem);
+}
+
 const brl = new Intl.NumberFormat("pt-BR", {
   style: "currency",
   currency: "BRL",
