@@ -26,9 +26,10 @@ export function mensagemImovel(i: Pick<ImovelResumo, "codigo" | "tipo" | "bairro
 const TINTIM: [tipo: string, link: string][] = [
   ["apartamento", "https://tintim.link/whatsapp/9fd9dba2-37e8-47a7-afee-e7dbb4fd5db1/c8fbc576-2ae9-400e-a64f-6f17c581bbe9"],
   ["casa", "https://tintim.link/whatsapp/9fd9dba2-37e8-47a7-afee-e7dbb4fd5db1/6e5673d1-42fa-461b-aba4-7e290d1c87a0"],
+  ["sala", "https://tintim.link/whatsapp/9fd9dba2-37e8-47a7-afee-e7dbb4fd5db1/1272e4cc-295c-4f21-b0a1-402d0fdf4f2d"],
 ];
 
-/** WhatsApp do botão "Tenho interesse": Tintim para apartamentos e casas, direto para o resto. */
+/** WhatsApp do botão "Tenho interesse": Tintim para apartamentos, casas e salas; direto para o resto. */
 export function whatsappImovel(i: Pick<ImovelResumo, "codigo" | "tipo" | "bairro">) {
   const mensagem = mensagemImovel(i);
   const tipo = i.tipo.toLowerCase();
